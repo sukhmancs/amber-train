@@ -69,7 +69,7 @@ def save_checkpoint(fabric, tokenizer, model, optimizer, save_dir):
             state_dict_type=StateDictType.FULL_STATE_DICT,
             state_dict_config=save_policy):
         state_dict = model._forward_module.state_dict()
-
+    
     if fabric.global_rank == 0:
         tokenizer.save_pretrained(save_dir)
         assert isinstance(model.module, LlamaForCausalLM)

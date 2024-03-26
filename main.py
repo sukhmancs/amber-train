@@ -206,8 +206,7 @@ def main(n_nodes=1,
             per_device_batch_size=per_device_batch_size,
             accumulate_grad_batches=accumulate_grad_batches,
             chunk_idx=chunk_idx,
-            run_wandb=run_wandb)
-
+            run_wandb=run_wandb)    
 
 if __name__ == '__main__':
     fire.Fire(main)
