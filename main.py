@@ -11,6 +11,7 @@ from torch.distributed.fsdp.wrap import transformer_auto_wrap_policy
 import lightning as L
 from lightning.fabric.strategies import FSDPStrategy
 from transformers import AutoConfig, AutoTokenizer
+from transformers.models.llama.configuration_llama import LlamaConfig
 
 from model_utils.modeling_llama import LlamaForCausalLM, LlamaDecoderLayer
 
@@ -149,14 +150,16 @@ def main(n_nodes=1,
 
     last_ckpt_idx = get_last_ckpt_idx(workdir=WORKDIR)
     fabric.seed_everything(RANDOM_SEED + last_ckpt_idx + 1)
-
-    tokenizer = None
-    # tokenizer = AutoTokenizer.from_pretrained(HF_MODEL_NAME_OR_PATH)
     
+    tokenizer = AutoTokenizer.from_pretrained(HF_MODEL_NAME_OR_PATH)
+    #model = LlamaForCausalLM( # REMOVE ME
+    #    config=AutoConfig.from_pretrained(HF_MODEL_NAME_OR_PATH))
+
     # just for testing i have added this config with custom values
     config = LlamaConfig(        
-        num_hidden_layers=2,         
-        num_attention_heads=2,                                  
+        num_hidden_layers=24,  
+        hidden_size=256,       
+        num_attention_heads=12,                                  
         use_cache=True)
     
     model = LlamaForCausalLM(
