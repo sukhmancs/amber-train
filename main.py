@@ -15,11 +15,11 @@ from transformers import AutoConfig, AutoTokenizer
 from model_utils.modeling_llama import LlamaForCausalLM, LlamaDecoderLayer
 
 from main_utils import (
+    save_checkpoint,
     load_jsonl_examples,
     get_cosine_lr_decay_fn,
     get_grad_norm,    
     get_last_ckpt_idx)
-
 
 TIMEZONE = timezone('EST')
 DATE = str(datetime.now(tz=TIMEZONE)).split()[0]
@@ -123,14 +123,14 @@ def train_chunk(fabric,
 
 
 def main(n_nodes=1,
-         n_devices_per_node=4,
+         n_devices_per_node=1,
          per_device_batch_size=10,
          accumulate_grad_batches=1,
          run_wandb=False):
     fabric = L.Fabric(
         accelerator=ACCELERATOR,
-        num_nodes=1,
-        devices=1,
+        num_nodes=n_nodes,
+        devices=n_devices_per_node,
         precision=PRECISION,
         strategy=FSDPStrategy(
             auto_wrap_policy=partial(
