@@ -32,7 +32,7 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers.utils import add_start_docstrings, add_start_docstrings_to_model_forward, logging, replace_return_docstrings
 from transformers.models.llama.configuration_llama import LlamaConfig
 
-from flash_attn import flash_attn_func
+# from flash_attn import flash_attn_func # REMOVE ME
 
 
 logger = logging.get_logger(__name__)
@@ -182,6 +182,14 @@ class LlamaAttention(nn.Module):
 
     def _shape(self, tensor: torch.Tensor, seq_len: int, bsz: int):
         return tensor.view(bsz, seq_len, self.num_heads, self.head_dim).transpose(1, 2).contiguous()
+    
+    def scaled_dot_product_attention(self, q, k, v):
+        matmul_qk = torch.matmul(q, k.transpose(-2, -1))
+        dk = torch.tensor(k.shape[-1], dtype=torch.float32)
+        scaled_attention_logits = matmul_qk / torch.sqrt(dk)
+        attention_weights = torch.nn.functional.softmax(scaled_attention_logits, dim=-1)
+        output = torch.matmul(attention_weights, v)
+        return output # [bsz, num_attention_heads, q_len, head_dim]
 
     def forward(
         self,
@@ -242,11 +250,18 @@ class LlamaAttention(nn.Module):
         #
         # attn_output = attn_output.transpose(1, 2)
 
-        attn_output = flash_attn_func(
-            q=query_states.transpose(1, 2).to(torch.bfloat16),
-            k=key_states.transpose(1, 2).to(torch.bfloat16),
-            v=value_states.transpose(1, 2).to(torch.bfloat16),
-            causal=True) # [bsz, q_len, num_attention_heads, head_dim]
+        # attn_output = flash_attn_func(
+        #     q=query_states.transpose(1, 2).to(torch.bfloat16),
+        #     k=key_states.transpose(1, 2).to(torch.bfloat16),
+        #     v=value_states.transpose(1, 2).to(torch.bfloat16),
+        #     causal=True) # [bsz, q_len, num_attention_heads, head_dim]
+
+        attn_output = self.scaled_dot_product_attention( # REMOVE ME
+            query_states.transpose(1, 2),
+            key_states.transpose(1, 2),
+            value_states.transpose(1, 2)
+        ) # [bsz, num_attention_heads, q_len, head_dim]
+
         attn_output = attn_output.reshape(bsz, q_len, self.hidden_size)
         attn_output = attn_output.to(query_states.dtype)
 
