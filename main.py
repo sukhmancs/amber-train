@@ -12,7 +12,7 @@ import lightning as L
 from lightning.fabric.strategies import FSDPStrategy
 from transformers import AutoConfig, AutoTokenizer
 
-# from model_utils.modeling_llama import LlamaForCausalLM, LlamaDecoderLayer
+from model_utils.modeling_llama import LlamaForCausalLM, LlamaDecoderLayer
 
 from main_utils import (
     load_jsonl_examples,
