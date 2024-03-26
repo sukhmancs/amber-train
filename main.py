@@ -158,8 +158,8 @@ def main(n_nodes=1,
     # just for testing i have added this config with custom values
     config = LlamaConfig(        
         num_hidden_layers=24,  
-        hidden_size=256,       
-        num_attention_heads=12,                                  
+        hidden_size=512,       
+        num_attention_heads=8,                                  
         use_cache=True)
     
     model = LlamaForCausalLM(
