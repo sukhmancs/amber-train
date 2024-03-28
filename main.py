@@ -42,9 +42,9 @@ ACCELERATOR = 'cuda'
 PRECISION = 'bf16-mixed'
 RANDOM_SEED = 11111
 
-TRAIN_DATA_DIR = './redpajama_v1_llama_json_merged_360/train' # './data'
-TRAIN_EXAMPLES_PER_CHUNK = 10
-N_CHUNKS = 0 # 360
+TRAIN_DATA_DIR = './amber-data-arxiv-chunked-360/train' # './data'
+TRAIN_EXAMPLES_PER_CHUNK = 71
+N_CHUNKS = 360
 
 def collate_fn(examples, device):
     token_ids = torch.tensor(
