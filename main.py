@@ -44,7 +44,7 @@ RANDOM_SEED = 11111
 
 TRAIN_DATA_DIR = './../amber-data-arxiv-chunked-360/train' # './data'
 TRAIN_EXAMPLES_PER_CHUNK = 71
-N_CHUNKS = 42 # 360
+N_CHUNKS = 11 # 360
 
 def collate_fn(examples, device):
     token_ids = torch.tensor(
