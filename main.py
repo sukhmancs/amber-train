@@ -125,7 +125,7 @@ def train_chunk(fabric,
 
 def main(n_nodes=1,
          n_devices_per_node=1,
-         per_device_batch_size=1,
+         per_device_batch_size=1, # REMOVE ME (was 10 before)
          accumulate_grad_batches=1,
          run_wandb=False):
     fabric = L.Fabric(
