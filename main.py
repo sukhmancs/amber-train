@@ -128,6 +128,7 @@ def main(n_nodes=1,
          per_device_batch_size=1, # REMOVE ME (was 10 before)
          accumulate_grad_batches=1,
          run_wandb=False):
+    
     fabric = L.Fabric(
         accelerator=ACCELERATOR,
         num_nodes=n_nodes,
@@ -163,6 +164,7 @@ def main(n_nodes=1,
     config.use_cache = True
 
     model = LlamaForCausalLM(config=config)
+    print(f"Model type: {type(model)}")    
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=LEARNING_RATE,
