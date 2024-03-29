@@ -84,7 +84,7 @@ def get_grad_norm(model):
 def save_checkpoint(fabric, tokenizer, model, optimizer, save_dir): # REMOVE ME
     if fabric.global_rank == 0:
         tokenizer.save_pretrained(save_dir)
-        assert isinstance(model, LlamaForCausalLM)
+        assert isinstance(model.module, LlamaForCausalLM)
         model.save_pretrained(save_dir, safe_serialization=False)
 
     fabric.barrier()
