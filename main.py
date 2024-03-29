@@ -157,12 +157,17 @@ def main(n_nodes=1,
     #     config=AutoConfig.from_pretrained(HF_MODEL_NAME_OR_PATH))
 
     # just for testing i have added this config with custom values
-    config = AutoConfig.from_pretrained(HF_MODEL_NAME_OR_PATH) # REMOVE ME
-    config.num_hidden_layers = 24
-    config.hidden_size = 512
-    config.num_attention_heads = 8
-    config.use_cache = True
-
+    config = LlamaConfig(
+        vocab_size=100,
+        num_hidden_layers=2,
+        hidden_size=64,
+        num_attention_heads=2,
+        intermediate_size=8,
+        hidden_act="relu",
+        rms_norm_eps=1e-5,
+        max_position_embeddings=2048,
+        initializer_range=0.02,
+        use_cache=True)
     model = LlamaForCausalLM(config=config)
     print(f"Model type: {type(model)}")    
     optimizer = torch.optim.AdamW(
