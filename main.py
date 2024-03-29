@@ -115,12 +115,14 @@ def train_chunk(fabric,
         if run_wandb and fabric.global_rank == 0:
             wandb.log(log)
 
-    save_checkpoint(
-        fabric=fabric,
-        tokenizer=tokenizer,
-        model=model,
-        optimizer=optimizer,
-        save_dir=f'{WORKDIR}/ckpt_{chunk_idx}')
+    # Save checkpoint every 10 chunks
+    if chunk_idx % 10 == 0: # REMOVE ME
+        save_checkpoint(
+            fabric=fabric,
+            tokenizer=tokenizer,
+            model=model,
+            optimizer=optimizer,
+            save_dir=f'{WORKDIR}/ckpt_{chunk_idx}')
 
 
 def main(n_nodes=1,
@@ -177,7 +179,7 @@ def main(n_nodes=1,
             path=f'{WORKDIR}/ckpt_{last_ckpt_idx}/fabric_ckpt',
             state={'model': model, 'optimizer': optimizer})
 
-    torch.cuda.empty_cache()
+    torch.cuda.empty_cache() # clear cache to avoid OOM error.
 
     global_micro_batch_size = per_device_batch_size * fabric.world_size
     total_steps = TRAIN_EXAMPLES_PER_CHUNK // global_micro_batch_size * N_CHUNKS
