@@ -42,7 +42,7 @@ ACCELERATOR = 'cuda'
 PRECISION = 'bf16-mixed'
 RANDOM_SEED = 11111
 
-TRAIN_DATA_DIR = './amber-data-arxiv-chunked-360/train' # './data'
+TRAIN_DATA_DIR = './../amber-data-arxiv-chunked-360/train' # './data'
 TRAIN_EXAMPLES_PER_CHUNK = 71
 N_CHUNKS = 360
 
