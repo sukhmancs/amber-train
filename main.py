@@ -152,18 +152,18 @@ def main(n_nodes=1,
     fabric.seed_everything(RANDOM_SEED + last_ckpt_idx + 1)
     
     tokenizer = AutoTokenizer.from_pretrained(HF_MODEL_NAME_OR_PATH)
-    model = LlamaForCausalLM(
-        config=AutoConfig.from_pretrained(HF_MODEL_NAME_OR_PATH))
+    # model = LlamaForCausalLM(
+    #     config=AutoConfig.from_pretrained(HF_MODEL_NAME_OR_PATH))
 
     # just for testing i have added this config with custom values
-    # config = LlamaConfig(        # REMOVE ME
-    #     num_hidden_layers=24,  
-    #     hidden_size=512,       
-    #     num_attention_heads=8,                                  
-    #     use_cache=True)
+    config = LlamaConfig(        # REMOVE ME
+        num_hidden_layers=24,  
+        hidden_size=512,       
+        num_attention_heads=8,                                  
+        use_cache=True)
     
-    # model = LlamaForCausalLM(
-    #     config=config) # Initialize LlamaForCausalLM with default config
+    model = LlamaForCausalLM(
+        config=config) # Initialize LlamaForCausalLM with default config
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=LEARNING_RATE,
