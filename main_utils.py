@@ -85,13 +85,16 @@ def save_checkpoint(fabric, tokenizer, model, optimizer, save_dir): # REMOVE ME
     if fabric.global_rank == 0:
         tokenizer.save_pretrained(save_dir)
         assert isinstance(model.module, LlamaForCausalLM)
-        model.save_pretrained(save_dir, safe_serialization=False)
+        model.module.save_pretrained(save_dir, safe_serialization=False)
 
     fabric.barrier()
-    fabric.save(
-        path=f'{save_dir}/fabric_ckpt',
-        state={'model': model.state_dict(), 'optimizer': optimizer.state_dict()})
-    
+    try:
+        fabric.save(
+            path=f'{save_dir}/fabric_ckpt',
+            state={'model': model.state_dict(), 'optimizer': optimizer.state_dict()})
+    except OSError as e:
+        print(f"Failed to save checkpoint to {save_dir}/fabric_ckpt: {e}")
+        
 def get_last_ckpt_idx(workdir):
     last_ckpt_idx = -1
     for ckpt_dir in glob.glob(f'{workdir}/ckpt_*'):
