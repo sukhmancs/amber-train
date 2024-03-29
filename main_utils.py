@@ -7,7 +7,7 @@ import numpy as np
 from torch.distributed.fsdp import FullStateDictConfig
 from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
 from torch.distributed.fsdp import StateDictType
-from lightning.fabric.strategies import FSDPStrategy
+# from lightning.fabric.strategies import FSDPStrategy # REMOVE ME
 
 from model_utils.modeling_llama import LlamaForCausalLM
 
@@ -59,29 +59,39 @@ def get_grad_norm(model):
     return square_sum ** 0.5
 
 
-def save_checkpoint(fabric, tokenizer, model, optimizer, save_dir):
-    assert isinstance(fabric.strategy, FSDPStrategy)
+# def save_checkpoint(fabric, tokenizer, model, optimizer, save_dir):
+#     assert isinstance(fabric.strategy, FSDPStrategy)
 
-    save_policy = FullStateDictConfig(
-        offload_to_cpu=(fabric.world_size > 1), rank0_only=True)
-    with FSDP.state_dict_type(
-            model,
-            state_dict_type=StateDictType.FULL_STATE_DICT,
-            state_dict_config=save_policy):
-        state_dict = model._forward_module.state_dict()
+#     save_policy = FullStateDictConfig(
+#         offload_to_cpu=(fabric.world_size > 1), rank0_only=True)
+#     with FSDP.state_dict_type(
+#             model,
+#             state_dict_type=StateDictType.FULL_STATE_DICT,
+#             state_dict_config=save_policy):
+#         state_dict = model._forward_module.state_dict()
     
+#     if fabric.global_rank == 0:
+#         tokenizer.save_pretrained(save_dir)
+#         assert isinstance(model.module, LlamaForCausalLM)
+#         model.module.save_pretrained(
+#             save_dir, state_dict=state_dict, safe_serialization=False)
+
+#     fabric.barrier()
+#     fabric.save(
+#         path=f'{save_dir}/fabric_ckpt',
+#         state={'model': model, 'optimizer': optimizer})
+
+def save_checkpoint(fabric, tokenizer, model, optimizer, save_dir): # REMOVE ME
     if fabric.global_rank == 0:
         tokenizer.save_pretrained(save_dir)
-        assert isinstance(model.module, LlamaForCausalLM)
-        model.module.save_pretrained(
-            save_dir, state_dict=state_dict, safe_serialization=False)
+        assert isinstance(model, LlamaForCausalLM)
+        model.save_pretrained(save_dir, safe_serialization=False)
 
     fabric.barrier()
     fabric.save(
         path=f'{save_dir}/fabric_ckpt',
-        state={'model': model, 'optimizer': optimizer})
-
-
+        state={'model': model.state_dict(), 'optimizer': optimizer.state_dict()})
+    
 def get_last_ckpt_idx(workdir):
     last_ckpt_idx = -1
     for ckpt_dir in glob.glob(f'{workdir}/ckpt_*'):

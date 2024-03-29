@@ -9,7 +9,7 @@ import tqdm
 import torch
 from torch.distributed.fsdp.wrap import transformer_auto_wrap_policy
 import lightning as L
-from lightning.fabric.strategies import FSDPStrategy
+#from lightning.fabric.strategies import FSDPStrategy
 from transformers import AutoConfig, AutoTokenizer
 from transformers.models.llama.configuration_llama import LlamaConfig
 
@@ -133,13 +133,13 @@ def main(n_nodes=1,
         num_nodes=n_nodes,
         devices=n_devices_per_node,
         precision=PRECISION,
-        strategy=FSDPStrategy(
-            auto_wrap_policy=partial(
-                transformer_auto_wrap_policy,
-                transformer_layer_cls={LlamaDecoderLayer}),
-            activation_checkpointing_policy={LlamaDecoderLayer},
-            cpu_offload=True,
-            limit_all_gathers=True)
+        # strategy=FSDPStrategy( # REMOVE ME (uncomment me when training on multiple GPUs)
+        #     auto_wrap_policy=partial(
+        #         transformer_auto_wrap_policy,
+        #         transformer_layer_cls={LlamaDecoderLayer}),
+        #     activation_checkpointing_policy={LlamaDecoderLayer},
+        #     cpu_offload=True,
+        #     limit_all_gathers=True)
         )    
     fabric.launch()
 
@@ -163,7 +163,7 @@ def main(n_nodes=1,
         use_cache=True)
     
     model = LlamaForCausalLM(
-        config=config) # Initialize LlamaForCausalLM with default config
+        config=config) 
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=LEARNING_RATE,
